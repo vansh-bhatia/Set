@@ -28,49 +28,7 @@ class ViewController: UIViewController {
 
             for button in cardButtons {
 
-                let randIndex = Int(arc4random_uniform(UInt32(game.deck.count)))
-
-                dict[button] = game.deck[randIndex]
-
-
-                var color = dict[button]!.getColor()
-                let number = dict[button]!.number.rawValue
-                let text = dict[button]!.symbol.rawValue
-                var newText = ""
-
-                var width = 5
-                if(dict[button]!.shading == .striped) {
-                    color = color.withAlphaComponent(0.35)
-                }
-                else if(game.deck[randIndex].shading == .solid) {
-                    width = 9
-                    width = -width
-                }
-                else {
-                    width = 9
-                }
-
-                for _ in 1...number {
-                    newText.append(text)
-                }
-
-
-                let attributes: [NSAttributedString.Key: Any] = [
-
-                        .strokeColor: color,
-                        .foregroundColor: color,
-                        .strokeWidth: width, // negative number here would mean fill (positive means outline)
-                    .font: UIFont(name: "System Font Regular", size: 29.5)!
-
-
-                ]
-                let attribtext = NSAttributedString(string: newText
-
-                    , attributes: attributes)
-
-                button.setAttributedTitle(attribtext, for: .normal)
-
-                game.deck.remove(at: randIndex)
+                createRandomCard(button)
             }
         }
     }
@@ -110,19 +68,27 @@ class ViewController: UIViewController {
             }
             if(game.evaluate(cards: cardArray)) {
                 print("SET MADE!!")
-                for card in activeCards {
-                    card.backgroundColor = .black
-
-                    let attributes: [NSAttributedString.Key: Any] = [
-                            .font: UIFont(name: "System Font Regular", size: 29.5)!
-                    ]
-                    let newText = NSAttributedString(string: "✅", attributes: attributes)
-                    card.setAttributedTitle(newText, for: .normal)
-                    dict[card]?.isOver = true
-                    dict[card]?.isFaceUp = true
-
-                }
                 score += 1
+                if(game.deck.count<3){
+                    for card in activeCards {
+                        card.backgroundColor = .black
+
+                        let attributes: [NSAttributedString.Key: Any] = [
+                                .font: UIFont(name: "System Font Regular", size: 29.5)!
+                        ]
+                        let newText = NSAttributedString(string: "✅", attributes: attributes)
+                        card.setAttributedTitle(newText, for: .normal)
+                        dict[card]?.isOver = true
+                        dict[card]?.isFaceUp = true
+
+                    }
+                }
+                else{
+                    for card in activeCards{
+                        createRandomCard(card)
+                    }
+                }
+                
             }
 
             activeCards.removeAll()
@@ -141,6 +107,52 @@ class ViewController: UIViewController {
 
 
 
+    }
+    
+    func createRandomCard(_ button:UIButton){
+        let randIndex = Int(arc4random_uniform(UInt32(game.deck.count)))
+
+        dict[button] = game.deck[randIndex]
+
+
+        var color = dict[button]!.getColor()
+        let number = dict[button]!.number.rawValue
+        let text = dict[button]!.symbol.rawValue
+        var newText = ""
+
+        var width = 5
+        if(dict[button]!.shading == .striped) {
+            color = color.withAlphaComponent(0.35)
+        }
+        else if(game.deck[randIndex].shading == .solid) {
+            width = 9
+            width = -width
+        }
+        else {
+            width = 9
+        }
+
+        for _ in 1...number {
+            newText.append(text)
+        }
+
+
+        let attributes: [NSAttributedString.Key: Any] = [
+
+                .strokeColor: color,
+                .foregroundColor: color,
+                .strokeWidth: width, // negative number here would mean fill (positive means outline)
+            .font: UIFont(name: "System Font Regular", size: 29.5)!
+
+
+        ]
+        let attribtext = NSAttributedString(string: newText
+
+            , attributes: attributes)
+
+        button.setAttributedTitle(attribtext, for: .normal)
+
+        game.deck.remove(at: randIndex)
     }
 
     override func viewDidLoad() {
